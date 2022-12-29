@@ -409,7 +409,8 @@ module cpu(
              .ram_rw_select_out(mem_wr),
              .ram_addr_out(mem_a),
              .ram_data_out(mem_dout),
-             .ram_data_in(mem_din)
+             .ram_data_in(mem_din),
+             .uart_full_in(io_buffer_full)
            );
   rs rs0(
        .clk(clk_in),

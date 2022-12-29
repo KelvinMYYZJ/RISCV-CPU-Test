@@ -37,8 +37,14 @@ module mem_ctrl (
     output reg ram_rw_select_out,
     output reg [`AddrType] ram_addr_out,
     output reg [`ByteType] ram_data_out,
-    input wire [`ByteType] ram_data_in
+    input wire [`ByteType] ram_data_in,
+
+    // uart
+    input wire uart_full_in
   );
+  reg stall_for_io;
+  wire accessing_io_flag = (iq_addr_in & 32'h00030000) == 32'h00030000;
+  wire uart_ban_store_flag = (uart_full_in || stall_for_io) && accessing_io_flag;
   localparam idle = 0;
   localparam deal_if = 1;
   localparam deal_lb = 2;
@@ -56,10 +62,12 @@ module mem_ctrl (
       // ram_addr_out <= `MaxWord;
       ram_rw_select_out <= 0;
       stat <= idle;
+      stall_for_io <= `False;
     end
     else begin
       chip_enable <= rdy;
       if (rdy) begin
+        stall_for_io <= `False;
         if (clear_flag_in) begin
           stat <= idle;
           ram_rw_select_out <= 0;
@@ -76,7 +84,7 @@ module mem_ctrl (
             lb_result_enable_out <= `False;
             iq_result_enable_out <= `False;
             if (stat == idle) begin
-              if (iq_store_enable_in || iq_pending) begin
+              if ((iq_store_enable_in || iq_pending) && !uart_ban_store_flag) begin
                 iq_pending <= `False;
                 stat <= deal_iq;
                 ram_io_stat <= 0;
@@ -149,6 +157,8 @@ module mem_ctrl (
               // ram_addr_out <= `MaxWord;
               stat <= idle;
               iq_result_enable_out <= `True;
+              if (accessing_io_flag)
+                stall_for_io <= `True;
             end
           end
         end
