@@ -1,5 +1,8 @@
-`define DEBUGFLAG 0
-`define SHOWCOMMITLAG 0
+`define DEBUG_FLAG 0
+`define SHOW_COMMIT_FLAG 0
+`define CACHE_VAILD_FLAG 1
+`define RECORD_WAVE_FLAG 0
+`define TICK_LIMIT 0 // 0 for not stop manually
 
 `define Opcode_LoadMem 7'b0000011   //ImmType = I
 `define Opcode_StoreMem 7'b0100011  //ImmType = S
@@ -56,13 +59,20 @@
 `define False 1'b0
 `define True 1'b1
 
-`define IqAddrLen 5
+`define IqAddrLen 2
 `define IqAddrType `IqAddrLen-1:0
 `define IqLen 2**`IqAddrLen
 `define IqIdxRange `IqLen-1:0
 
-`define RsAddrLen 5
+`define RsAddrLen 2
 `define RsAddrType `RsAddrLen-1:0
 `define RsLen 2**`RsAddrLen
 `define RsIdxRange `RsLen-1:0
 `define RsMaxLsCnt 4
+
+`define ICacheAddrLen 4
+`define ICacheAddrType `ICacheAddrLen-1:0
+`define ICacheLen 2**`ICacheAddrLen
+`define ICacheArrayRange `ICacheLen-1:0
+`define ICacheIdxRange `ICacheAddrLen+2-1:2
+`define ICacheTagRange `AddrLen-1:`ICacheAddrLen+2
